@@ -7,6 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class StratumProtocol(asyncio.Protocol):
     client = None
     closed = False
@@ -30,7 +31,8 @@ class StratumProtocol(asyncio.Protocol):
         *lines, self.buf = self.buf.split(b'\n')
 
         for line in lines:
-            if not line: continue
+            if not line:
+                continue
 
             try:
                 msg = line.decode('utf-8', "error").strip()

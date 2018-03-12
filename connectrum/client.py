@@ -20,6 +20,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class StratumClient:
 
     def __init__(self, loop=None):
@@ -34,7 +35,7 @@ class StratumClient:
         self.subscriptions = defaultdict(list)
 
         self.ka_task = None
-
+        self.keepalive_interval = 300
         self.loop = loop or asyncio.get_event_loop()
 
         # next step: call connect()
@@ -60,7 +61,6 @@ class StratumClient:
             self.ka_task.cancel()
             self.ka_task = None
             
-
     async def connect(self, server_info, proto_code=None, *,
                             use_tor=False, disable_cert_verify=False,
                             proxy=None, short_term=False):
@@ -147,8 +147,7 @@ class StratumClient:
         while self.protocol:
             vers = await self.RPC('server.version')
             logger.debug("Server version: " + vers)
-            await asyncio.sleep(600)
-
+            await asyncio.sleep(self.keepalive_interval)
 
     def _send_request(self, method, params=[], is_subscribe = False):
         '''

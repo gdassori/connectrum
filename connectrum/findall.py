@@ -7,6 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class IrcListener(bottom.Client):
     def __init__(self, irc_nickname=None, irc_password=None, ssl=True):
         self.my_nick = irc_nickname or 'XC%d' % random.randint(1E11, 1E12)
