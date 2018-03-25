@@ -42,10 +42,12 @@ class StratumClient:
 
     def _connection_lost(self, protocol):
         # Ignore connection_lost for old connections
+        self.disconnect_callback and self.disconnect_callback(self)
         if protocol is not self.protocol:
             return
 
         self.protocol = None
+
         logger.warn("Electrum server connection lost")
 
         # cleanup keep alive task
@@ -63,11 +65,12 @@ class StratumClient:
             
     async def connect(self, server_info, proto_code=None, *,
                             use_tor=False, disable_cert_verify=False,
-                            proxy=None, short_term=False):
+                            proxy=None, short_term=False, disconnect_callback=None):
         '''
             Start connection process.
             Destination must be specified in a ServerInfo() record (first arg).
         '''
+        self.disconnect_callback = disconnect_callback
         self.server_info = server_info
         if not proto_code:
              proto_code,*_ = server_info.protocols
