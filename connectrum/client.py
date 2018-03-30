@@ -137,6 +137,13 @@ class StratumClient:
         self.protocol = protocol
         protocol.client = self
 
+        try:
+            await self.RPC('server.version', '%s 1.2' % server_info.get('nickname', 'spruned light client'), '1.2')
+        except:
+            logger.error('Unsupported protocol version')
+            self.protocol = None
+            return
+
         if not short_term:
             self.ka_task = self.loop.create_task(self._keepalive())
 
