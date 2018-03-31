@@ -34,6 +34,7 @@ class ServerInfo(dict):
         self['nickname'] = nickname_or_dict or None
         self['hostname'] = hostname
         self['ip_addr'] = ip_addr or None
+        self['local_version'] = version
 
         # For 'ports', take
         # - a number (int), assumed to be TCP port, OR

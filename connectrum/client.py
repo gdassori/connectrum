@@ -139,13 +139,13 @@ class StratumClient:
         protocol.client = self
 
         try:
-            payload = '%s %s' % (self.server_info['nickname'], self.server_info['version'])
-            self.server_version = await self.RPC('server.version', payload, self.server_info['version'])
+            payload = '%s %s' % (self.server_info['nickname'], self.server_info['local_version'])
+            self.server_version = await self.RPC('server.version', payload, self.server_info['local_version'])
             res = await self.RPC('blockchain.scripthash.listunspent', '0'*64)
             if isinstance(res, Exception):
                 raise res
-        except Exception as e:
-            logger.debug('Unsupported protocol version: %s (%s)', self.server_info['version'], e)
+        except Exception:
+            logger.debug('Unsupported protocol version: %s', self.server_info['local_version'])
             try:
                 self.protocol.close()
             except:
@@ -164,9 +164,9 @@ class StratumClient:
             pointless traffic.
         '''
         while self.protocol:
-            payload = '%s %s' % (self.server_info['nickname'], self.server_info['version'])
-            vers = await self.RPC('server.version', payload, self.server_info.version)
-            logger.debug("Server version: " + vers)
+            payload = '%s %s' % (self.server_info['nickname'], self.server_info['local_version'])
+            vers = await self.RPC('server.version', payload, self.server_info['local_version'])
+            logger.debug("Server version: %s", vers)
             await asyncio.sleep(self.keepalive_interval)
 
     def _send_request(self, method, params=[], is_subscribe = False):
