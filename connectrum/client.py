@@ -37,6 +37,7 @@ class StratumClient:
         self.ka_task = None
         self.keepalive_interval = 300
         self.loop = loop or asyncio.get_event_loop()
+        self.server_version = None
 
         # next step: call connect()
 
@@ -139,7 +140,7 @@ class StratumClient:
 
         try:
             payload = '%s %s' % (self.server_info['nickname'], self.server_info['version'])
-            await self.RPC('server.version', payload, self.server_info['version'])
+            self.server_version = await self.RPC('server.version', payload, self.server_info['version'])
             res = await self.RPC('blockchain.scripthash.listunspent', '0'*64)
             if isinstance(res, Exception):
                 raise res
