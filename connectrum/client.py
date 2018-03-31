@@ -138,11 +138,19 @@ class StratumClient:
         protocol.client = self
 
         try:
-            await self.RPC('server.version', '%s 1.2' % server_info.get('nickname', 'spruned light client'), '1.2')
-        except:
-            logger.error('Unsupported protocol version')
+            payload = '%s %s' % (self.server_info['nickname'], self.server_info['version'])
+            await self.RPC('server.version', payload, self.server_info['version'])
+            res = await self.RPC('blockchain.scripthash.listunspent', '0'*64)
+            if isinstance(res, Exception):
+                raise res
+        except Exception as e:
+            logger.debug('Unsupported protocol version: %s (%s)', self.server_info['version'], e)
+            try:
+                self.protocol.close()
+            except:
+                pass
             self.protocol = None
-            return
+            raise
 
         if not short_term:
             self.ka_task = self.loop.create_task(self._keepalive())
@@ -155,7 +163,8 @@ class StratumClient:
             pointless traffic.
         '''
         while self.protocol:
-            vers = await self.RPC('server.version')
+            payload = '%s %s' % (self.server_info['nickname'], self.server_info['version'])
+            vers = await self.RPC('server.version', payload, self.server_info.version)
             logger.debug("Server version: " + vers)
             await asyncio.sleep(self.keepalive_interval)
 
