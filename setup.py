@@ -23,7 +23,7 @@ def get_version():
     with open("connectrum/__init__.py") as f:
         for line in f:
             if line.startswith("__version__"):
-                return eval(line.split("=")[-1]) + '-gdassori-0.4'
+                return eval(line.split("=")[-1])
 
 REQUIREMENTS = [
     # none at this time
